@@ -104,7 +104,7 @@ const setAccessHeaders = () => {
     setResponseHeader('Access-Control-Allow-Origin', getRequestHeader('origin'));
   } else {
     data.originList.forEach(row => {
-      setResponseHeader('Access-Control-Allow-Origin', row.origin);
+      if (row.origin === getRequestHeader('origin')) setResponseHeader('Access-Control-Allow-Origin', row.origin);
     });
   }
   setResponseHeader('Access-Control-Allow-Credentials', 'true');
