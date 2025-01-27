@@ -1,21 +1,15 @@
-﻿___TERMS_OF_SERVICE___
-
-By creating or modifying this file you agree to Google Tag Manager's Community
-Template Gallery Developer Terms of Service available at
-https://developers.google.com/tag-manager/gallery-tos (or such other URL as
-Google may provide), as modified from time to time.
-
-
-___INFO___
+﻿___INFO___
 
 {
   "type": "CLIENT",
   "id": "cvt_temp_public_id",
   "version": 1,
   "securityGroups": [],
-  "__wm": "VGVtcGxhdGUtQXV0aG9yX0lQR2VvbG9jYXRpb25BUElTZXJ2ZXItU2ltby1BaGF2YQ==",
-  "category": ["UTILITY"],
-  "displayName": "IP & Geolocation API",
+  "__wm": "VGVtcGxhdGUtQXV0aG9yX0lQR2VvbG9jYXRpb25BUElTZXJ2ZXItU2ltby1BaGF2YQ\u003d\u003d",
+  "category": [
+    "UTILITY"
+  ],
+  "displayName": "IP \u0026 Geolocation API",
   "brand": {
     "id": "brand_dummy",
     "displayName": "",
@@ -73,6 +67,24 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "newRowButtonText": "Add origin"
+  },
+  {
+    "type": "RADIO",
+    "name": "deploymentType",
+    "displayName": "Deployment type",
+    "radioItems": [
+      {
+        "value": "Cloud Run",
+        "displayValue": "run"
+      },
+      {
+        "value": "App Engine",
+        "displayValue": "app"
+      }
+    ],
+    "simpleValueType": true,
+    "defaultValue": "run",
+    "help": "If your deployment is Cloud Run, make sure you first \u003ca href\u003d\"https://developers.google.com/tag-platform/tag-manager/server-side/enable-region-specific-settings#CloudRun\"\u003eupdate your Load Balancer\u003c/a\u003e to include the geo headers. If using App Engine, the geo headers are automatically populated."
   }
 ]
 
@@ -92,6 +104,12 @@ const setResponseBody = require('setResponseBody');
 const setResponseStatus = require('setResponseStatus');
 
 const API_PATH = '/geo/';
+
+const GEO = {
+  city: data.deploymentType === 'app' ? 'x-appengine-city' : 'x-gclb-city',
+  country: data.deploymentType === 'app' ? 'x-appengine-country' : 'x-gclb-country',
+  region: data.deploymentType === 'app' ? 'x-appengine-region' : 'x-gclb-region'
+};
 
 const fail = msg => {
   setResponseStatus(500);
@@ -122,10 +140,9 @@ if (getRequestPath() === API_PATH) {
   const responseData = {
     user_ip: getRemoteAddress(),
     geo: {
-      city: getRequestHeader('X-Appengine-City'),
-      city_lat_long: getRequestHeader('X-Appengine-Citylatlong'),
-      country: getRequestHeader('X-Appengine-Country'),
-      region: getRequestHeader('X-Appengine-Region')
+      city: getRequestHeader(GEO.city),
+      country: getRequestHeader(GEO.country),
+      region: getRequestHeader(GEO.region)
     }
   };
   
@@ -206,7 +223,7 @@ ___SERVER_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "x-appengine-city"
+                    "string": "x-gclb-city"
                   }
                 ]
               },
@@ -221,7 +238,37 @@ ___SERVER_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "x-appengine-citylatlong"
+                    "string": "x-gclb-country"
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "x-gclb-region"
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "x-appengine-city"
                   }
                 ]
               },
