@@ -1,6 +1,8 @@
 homepage: "https://www.simoahava.com/"
 versions:
   # Latest version
+  - sha: 21cbef1bfe4659aec3191fa20b7d75afebe2500e
+    changeNotes: Fix to support both GCR and GAE deployments
   - sha: 6949f34e4f99be84530aa1a41417e01950aba92a
     changeNotes: Initial release.
   # Older versions
